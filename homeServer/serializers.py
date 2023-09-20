@@ -32,12 +32,12 @@ class TeamSerializer(BaseModelSerializer):
 
 
 class BookingSerializer(BaseModelSerializer):
-    service_reviews = ServiceReviewSerializer(many=True)
-    assigned_team = TeamSerializer()
+    review = ServiceReviewSerializer(many=True)
+    assigned_to_team = TeamSerializer()
 
     class Meta:
         model = Booking
-        fields = ('id', 'booking_no', 'status', 'service_time', 'created_date', 'created_date', 'manager_comment', 'service_reviews', 'assigned_team')
+        fields = ('id', 'booking_no', 'status', 'service_time', 'created_date', 'created_date', 'manager_comment', 'review', 'assigned_to_team')
 
 
 class UserSerializer(BaseModelSerializer):

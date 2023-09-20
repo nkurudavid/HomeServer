@@ -4,6 +4,8 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.safestring import mark_safe
 from django.core.validators import FileExtensionValidator
+import random
+import string
 
 from . manager import UserManager
 
@@ -135,6 +137,19 @@ class Booking(models.Model):
     
     def __str__(self):
         return self.booking_no
+
+    def generate_booking_no(self):
+        # Generate a random booking number
+        length = 20  # You can adjust the length of the booking number
+        chars = string.ascii_uppercase + string.digits
+        return ''.join(random.choice(chars) for _ in range(length))
+
+    def save(self, *args, **kwargs):
+        # Generate a booking number if it doesn't exist
+        if not self.booking_no:
+            self.booking_no = self.generate_booking_no()
+        super().save(*args, **kwargs)
+        
 
 
 class ServiceReview(models.Model):

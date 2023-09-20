@@ -6,7 +6,10 @@ from .views import UserViewSet, ServiceCategoryViewSet, ServiceViewSet, BookingV
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'bookings', BookingViewSet)
-router.register(r'teams', TeamViewSet)
+
+# Create a nested router for 'teams' under 'bookings'
+booking_router = NestedSimpleRouter(router, r'bookings', lookup='booking')
+booking_router.register(r'assigned_to_team', TeamViewSet)
 
 # Register the 'service-categories' resource with the main router
 router.register(r'service-categories', ServiceCategoryViewSet)
@@ -19,6 +22,7 @@ service_category_router.register(r'services', ServiceViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/', include(service_category_router.urls)),
+    path('api/', include(booking_router.urls)),
 ]
 
 # Optional: Add a login URL for authentication if needed
