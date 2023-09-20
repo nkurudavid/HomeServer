@@ -9,25 +9,19 @@ from .serializers import UserSerializer, ServiceCategorySerializer, ServiceSeria
 
 
 
-
-# Create a viewset for the User model
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+class UserViewSet(viewsets.ViewSet):
     serializer_class = UserSerializer
 
-    # User signup view
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def signup(self, request):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            password = request.data.get('password')
             user = serializer.save()
-            user.set_password(password)
+            user.set_password(request.data.get('password'))
             user.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # User login view
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
         email = request.data.get('email')
@@ -35,30 +29,32 @@ class UserViewSet(viewsets.ModelViewSet):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            return Response(UserSerializer(user).data)
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'Login successful', 'user_id': user.id}, status=status.HTTP_200_OK)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # User profile view
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # Update user profile view
     @action(detail=False, methods=['put'], permission_classes=[IsAuthenticated])
     def update_profile(self, request):
-        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        serializer = self.serializer_class(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Delete user account view
     @action(detail=False, methods=['delete'], permission_classes=[IsAuthenticated])
     def delete_account(self, request):
         user = request.user
         user.delete()
-        return Response({"message": "Account deleted successfully"})
+        return Response({'message': 'Account deleted successfully'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def logout(self, request):
+        logout(request)
+        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
 
 
 

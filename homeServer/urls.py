@@ -4,7 +4,7 @@ from .views import UserViewSet, ServiceCategoryViewSet, ServiceViewSet, BookingV
 
 # Create the main router for top-level resources
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'users', UserViewSet, basename='user')
 router.register(r'bookings', BookingViewSet)
 
 # Create a nested router for 'teams' under 'bookings'
