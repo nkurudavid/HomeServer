@@ -1,18 +1,24 @@
+from rest_framework_nested.routers import DefaultRouter, NestedSimpleRouter
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 from .views import UserViewSet, ServiceCategoryViewSet, ServiceViewSet, BookingViewSet, TeamViewSet
 
-
+# Create the main router for top-level resources
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'service-categories', ServiceCategoryViewSet)
-router.register(r'services', ServiceViewSet)
 router.register(r'bookings', BookingViewSet)
 router.register(r'teams', TeamViewSet)
 
+# Register the 'service-categories' resource with the main router
+router.register(r'service-categories', ServiceCategoryViewSet)
 
+# Create a nested router for 'service-categories' to handle 'services'
+service_category_router = NestedSimpleRouter(router, r'service-categories', lookup='service_category')
+service_category_router.register(r'services', ServiceViewSet)
+
+# Define your urlpatterns
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('api/', include(service_category_router.urls)),
 ]
 
 # Optional: Add a login URL for authentication if needed

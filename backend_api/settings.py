@@ -30,7 +30,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '*',
+    "http://localhost",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+]
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost',
+)
+
 
 # Application definition
 
@@ -114,11 +124,8 @@ DATABASES = {
         'TEST_COLLATION': 'utf8_general_ci',
     }
 }
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:19006",
-    # Add other allowed origins here if needed
-]
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 # Password validation
